@@ -4,6 +4,31 @@ import numpy as np
 class ValueBuilder:
 
     @staticmethod
+    def getClassmates(dotClass, dots):
+        return filter(lambda x: x[1] == dotClass, dots)
+
+    # @staticmethod
+    # def getClassmates(dotClass, dots):
+    #     result = list()
+    #     for dot in dots:
+    #         if dot[1] == dotClass:
+    #             result.append(dot)
+    #     return result
+
+    @staticmethod
+    def findEtalons(dots):
+        result = list()
+        for dot in dots:
+            classmates = ValueBuilder.getClassmates(dot[1], dots)
+            # length = len(classmates)
+            distanceToClassmates = 0
+            for classmate in classmates:
+                distanceToClassmates += ValueBuilder.euclidian_distance(dot[0], classmate[0])
+            result.append([dot[0], dot[1], distanceToClassmates])
+
+        return list(sorted(result, key=lambda x: x[2]))
+
+    @staticmethod
     def spread_segment_equally(x1, x2, n):
         return np.linspace(x1, x2, num=n)
 

@@ -45,6 +45,11 @@ if __name__ == "__main__":
 
     learning_dot = ax.scatter(graphic_builder.random_point[0], graphic_builder.random_point[1],
                               s=graphic_builder.DOT_TESTING_SIZE, color=graphic_builder.DOT_TESTING_COLOR)
+
+    for etalon in graphic_builder.etalonsChosen:
+        ax.scatter(etalon[0][0], etalon[0][1], s=graphic_builder.ETALONS_SIZE, color=graphic_builder.ETALONS_COLOR)
+
+
     fig.tight_layout()
 
     # ax.legend(
