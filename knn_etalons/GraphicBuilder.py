@@ -4,6 +4,14 @@ from knn_etalons.ValueBuilder import ValueBuilder
 
 class GraphicBuilder:
     def __init__(self):
+
+        self.etalons = []
+        self.etalonsPercentage = 0.3
+
+        self.ETALONS_SIZE = 5
+        self.ETALONS_COLOR = 'magenta'
+
+
         self.WINDOW_WIDTH = 30 / 2.54
         self.WINDOW_HEIGHT = 13 / 2.54
 
@@ -72,12 +80,33 @@ class GraphicBuilder:
         self.random_point = ValueBuilder.get_random_point(self.a, self.b, self.c, self.d)
         self.classify_dot()
 
+    def getEtalons(self):
+        result = list()
+        values = set(map(lambda x:x[1], self.etalons))
+        newlist = [[y for y in self.etalons if y[1]==x] for x in values]
+        for dotsByClass in newlist:
+            classSize = len(dotsByClass)
+            etalonsNeeded = int(classSize * self.etalonsPercentage)
+            for i in range(0, etalonsNeeded):
+                result.append(dotsByClass[i])
+        return result
+
+
+
+
     def classify_dot(self):
         # array(coords,class,distance)
-        self.distances = ValueBuilder.distance_to_dots(self.random_point, self.classified_dots,
-                                                       self.DISTANCE_ALGORITHM)
+        self.etalons = ValueBuilder.findEtalons(self.classified_dots)
+
+        # self.etalonsChosen = self.etalons[:etalonsNeeded]
+        self.etalonsChosen = self.getEtalons()
+
+
+        self.distances = ValueBuilder.distance_to_dots(self.random_point, self.etalonsChosen,
+                                                 self.DISTANCE_ALGORITHM)
 
         self.point_class = ValueBuilder.classify_by_k_neighbours(self.distances[:self.k], self.WEIGHT_ALGORITHM)
+
 
     def get_hor_ver_class(self):
         h = 0
