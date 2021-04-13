@@ -11,6 +11,8 @@ class GraphicBuilder:
         self.ETALONS_SIZE = 5
         self.ETALONS_COLOR = 'magenta'
 
+        self.etalons_horizontal = []
+        self.etalons_vertical = []
 
         self.WINDOW_WIDTH = 30 / 2.54
         self.WINDOW_HEIGHT = 13 / 2.54
@@ -89,6 +91,8 @@ class GraphicBuilder:
             etalonsNeeded = int(classSize * self.etalonsPercentage)
             for i in range(0, etalonsNeeded):
                 result.append(dotsByClass[i])
+                self.etalons_horizontal.append(dotsByClass[i][0][0])
+                self.etalons_vertical.append(dotsByClass[i][0][1])
         return result
 
 

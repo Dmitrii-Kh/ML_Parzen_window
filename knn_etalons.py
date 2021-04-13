@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 from matplotlib import patches
 from matplotlib.widgets import Slider, RadioButtons, Button
-
+import numpy as np
 from knn_etalons.ValueBuilder import ValueBuilder
 from knn_etalons.GraphicBuilder import GraphicBuilder
 
@@ -46,9 +46,8 @@ if __name__ == "__main__":
     learning_dot = ax.scatter(graphic_builder.random_point[0], graphic_builder.random_point[1],
                               s=graphic_builder.DOT_TESTING_SIZE, color=graphic_builder.DOT_TESTING_COLOR)
 
-    for etalon in graphic_builder.etalonsChosen:
-        ax.scatter(etalon[0][0], etalon[0][1], s=graphic_builder.ETALONS_SIZE, color=graphic_builder.ETALONS_COLOR)
-
+    etalons = ax.scatter(graphic_builder.etalons_horizontal, graphic_builder.etalons_vertical,
+                         s=graphic_builder.ETALONS_SIZE, color=graphic_builder.ETALONS_COLOR)
 
     fig.tight_layout()
 
@@ -154,6 +153,8 @@ if __name__ == "__main__":
 
     def update_n(val):
         fig.canvas.draw_idle()
+        graphic_builder.etalons_vertical = []
+        graphic_builder.etalons_horizontal = []
         graphic_builder.n = int(val)
         graphic_builder.generate_ab_and_classify()
         global vertical_lines
@@ -163,10 +164,16 @@ if __name__ == "__main__":
         for index, vertical_line in enumerate(graphic_builder.ab_segment):
             vertical_lines[index] = ax.axvline(vertical_line, linestyle="-.", linewidth=graphic_builder.LINE_WIDTH)
         update_spans_classify()
+        etalon_dots = list(
+            sorted(np.column_stack((graphic_builder.etalons_horizontal, graphic_builder.etalons_vertical)),
+                   key=lambda x: (x[0], x[1])))
+        etalons.set_offsets(etalon_dots)
 
 
     def update_m(val):
         fig.canvas.draw_idle()
+        graphic_builder.etalons_vertical = []
+        graphic_builder.etalons_horizontal = []
         graphic_builder.m = int(val)
         graphic_builder.generate_cd_and_classify()
         global horizontal_lines
@@ -176,15 +183,25 @@ if __name__ == "__main__":
         for index, horizontal_line in enumerate(graphic_builder.cd_segment):
             horizontal_lines[index] = ax.axhline(horizontal_line, linestyle="-.", linewidth=graphic_builder.LINE_WIDTH)
         update_spans_classify()
+        etalon_dots = list(
+            sorted(np.column_stack((graphic_builder.etalons_horizontal, graphic_builder.etalons_vertical)),
+                   key=lambda x: (x[0], x[1])))
+        etalons.set_offsets(etalon_dots)
 
 
     def update_dots(val):
         fig.canvas.draw_idle()
+        graphic_builder.etalons_vertical = []
+        graphic_builder.etalons_horizontal = []
         graphic_builder.l = int(val)
         graphic_builder.generate_dots_and_clasify()
         graphic_builder.classify_dot()
         update_spans_classify()
         dots_graphic.set_offsets(graphic_builder.learning_dots)
+        etalon_dots = list(
+            sorted(np.column_stack((graphic_builder.etalons_horizontal, graphic_builder.etalons_vertical)),
+                   key=lambda x: (x[0], x[1])))
+        etalons.set_offsets(etalon_dots)
 
 
     def compute_k(event):
