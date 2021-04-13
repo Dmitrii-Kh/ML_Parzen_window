@@ -82,6 +82,10 @@ if __name__ == "__main__":
     h_slider = Slider(h_axes, 'h', graphic_builder.MIN_H, graphic_builder.MAX_H, valinit=graphic_builder.h,
                       valstep=0.05, color='blue')
 
+    etalons_axes = plt.axes([0.25, 0.15, 0.40, 0.02], facecolor='white')
+    etalons_slider = Slider(etalons_axes, 'Etalons', 0.01, 1, valinit=graphic_builder.etalonsPercentage,
+                      valstep=0.01, color='blue')
+
     rax = plt.axes([0.80, 0.03, 0.15, 0.12])
     radio = RadioButtons(rax, ('Boolean', 'Linear', 'Quadratic', 'Gauss'))
 
@@ -172,6 +176,17 @@ if __name__ == "__main__":
         fig.canvas.draw_idle()
         graphic_builder.h = float(val)
         update_spans_classify()
+
+    def update_etalons(val):
+        fig.canvas.draw_idle()
+        graphic_builder.etalons_vertical = []
+        graphic_builder.etalons_horizontal = []
+        graphic_builder.etalonsPercentage = float(val)
+        update_spans_classify()
+        etalon_dots = list(
+            sorted(np.column_stack((graphic_builder.etalons_horizontal, graphic_builder.etalons_vertical)),
+                   key=lambda x: (x[0], x[1])))
+        etalons.set_offsets(etalon_dots)
 
 
     def update_n(val):
@@ -272,6 +287,7 @@ if __name__ == "__main__":
     radio.on_clicked(update_weight)
     #   radio_distance.on_clicked(update_distance)
     h_slider.on_changed(update_h)
+    etalons_slider.on_changed(update_etalons)
     vert_slider.on_changed(update_n)
     hor_slider.on_changed(update_m)
     dots_slider.on_changed(update_dots)
