@@ -50,6 +50,14 @@ class GraphicBuilder:
         # self.WEIGHT_ALGORITHM = ValueBuilder.no_weigh
         self.KERNEL = ValueBuilder.boolean_kernel
 
+        self.etalons = []
+        self.etalonsPercentage = 0.3
+        self.etalons_horizontal = []
+        self.etalons_vertical = []
+
+        self.ETALONS_SIZE = 5
+        self.ETALONS_COLOR = 'magenta'
+
         # building points for segments equally
         self.ab_segment = ValueBuilder.spread_segment_equally(self.a, self.b, self.n + 1)
         self.cd_segment = ValueBuilder.spread_segment_equally(self.c, self.d, self.m + 1)
@@ -80,12 +88,27 @@ class GraphicBuilder:
         self.random_point = ValueBuilder.get_random_point(self.a, self.b, self.c, self.d)
         self.classify_dot()
 
+    def getEtalons(self):
+        result = list()
+        values = set(map(lambda x: x[1], self.etalons))
+        newlist = [[y for y in self.etalons if y[1] == x] for x in values]
+        for dotsByClass in newlist:
+            classSize = len(dotsByClass)
+            etalonsNeeded = int(classSize * self.etalonsPercentage)
+            for i in range(0, etalonsNeeded):
+                result.append(dotsByClass[i])
+                self.etalons_horizontal.append(dotsByClass[i][0][0])
+                self.etalons_vertical.append(dotsByClass[i][0][1])
+        return result
+
     def classify_dot(self):
-        # todo findEtalons() : sorted by ASC array(coords, class, sum of distances to 'classmates')
-        # todo take self.etalonsPercentage and pass to distance_to_dots
+        # findEtalons() : sorted by ASC array(coords, class, sum of distances to 'classmates')
+        self.etalons = ValueBuilder.findEtalons(self.classified_dots)
+
+        self.etalonsChosen = self.getEtalons()
 
         # array(coords,class,distance to random point)
-        self.distances = ValueBuilder.distance_to_dots(self.random_point, self.classified_dots,
+        self.distances = ValueBuilder.distance_to_dots(self.random_point, self.etalonsChosen,
                                                        self.DISTANCE_ALGORITHM)
 
         self.point_class = ValueBuilder.classify_by_parzen_fixed(self.distances, self.KERNEL, self.h)

@@ -46,6 +46,23 @@ class ValueBuilder:
         return 2.718 ** (-2 * r * r)
 
     @staticmethod
+    def getClassmates(dotClass, dots):
+        return filter(lambda x: x[1] == dotClass, dots)
+
+    @staticmethod
+    def findEtalons(dots):
+        result = list()
+        for dot in dots:
+            classmates = ValueBuilder.getClassmates(dot[1], dots)
+            distanceToClassmates = 0
+            for classmate in classmates:
+                distanceToClassmates += ValueBuilder.euclidian_distance(dot[0], classmate[0])
+            result.append([dot[0], dot[1], distanceToClassmates])
+
+        return list(sorted(result, key=lambda x: x[2]))
+
+
+    @staticmethod
     def distance_to_dots(dot, learning_dots, distance_method):
         result = list()
         for learning_dot in learning_dots:

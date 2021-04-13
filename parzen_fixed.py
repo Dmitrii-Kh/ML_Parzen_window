@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 from matplotlib import patches
 from matplotlib.widgets import Slider, RadioButtons, Button
+import numpy as np
 
 from parzen_fixed.ValueBuilder import ValueBuilder
 from parzen_fixed.GraphicBuilder import GraphicBuilder
@@ -35,7 +36,8 @@ if __name__ == "__main__":
     rect_height = graphic_builder.cd_segment[hor_res[1]] - graphic_builder.cd_segment[hor_res[0]]
 
     # Create a Rectangle patch
-    rect = patches.Rectangle((graphic_builder.ab_segment[ver_res[0]], graphic_builder.cd_segment[hor_res[0]]), rect_width, rect_height, linewidth=1.6, edgecolor='g', facecolor='none')
+    rect = patches.Rectangle((graphic_builder.ab_segment[ver_res[0]], graphic_builder.cd_segment[hor_res[0]]),
+                             rect_width, rect_height, linewidth=1.6, edgecolor='g', facecolor='none')
 
     # Add the patch to the Axes
     ax.add_patch(rect)
@@ -46,7 +48,11 @@ if __name__ == "__main__":
     learning_dot = ax.scatter(graphic_builder.random_point[0], graphic_builder.random_point[1],
                               s=graphic_builder.DOT_TESTING_SIZE, color=graphic_builder.DOT_TESTING_COLOR)
 
-    draw_circle = patches.Circle((graphic_builder.random_point[0], graphic_builder.random_point[1]), graphic_builder.h, fill=False)
+    etalons = ax.scatter(graphic_builder.etalons_horizontal, graphic_builder.etalons_vertical,
+                         s=graphic_builder.ETALONS_SIZE, color=graphic_builder.ETALONS_COLOR)
+
+    draw_circle = patches.Circle((graphic_builder.random_point[0], graphic_builder.random_point[1]), graphic_builder.h,
+                                 fill=False)
     ax.add_patch(draw_circle)
 
     fig.tight_layout()
@@ -73,7 +79,8 @@ if __name__ == "__main__":
                         valinit=graphic_builder.m, valstep=1, color='blue')
 
     h_axes = plt.axes([0.25, 0.12, 0.40, 0.02], facecolor='white')
-    h_slider = Slider(h_axes, 'h', graphic_builder.MIN_H, graphic_builder.MAX_H, valinit=graphic_builder.h, valstep=0.05, color='blue')
+    h_slider = Slider(h_axes, 'h', graphic_builder.MIN_H, graphic_builder.MAX_H, valinit=graphic_builder.h,
+                      valstep=0.05, color='blue')
 
     rax = plt.axes([0.80, 0.03, 0.15, 0.12])
     radio = RadioButtons(rax, ('Boolean', 'Linear', 'Quadratic', 'Gauss'))
@@ -102,13 +109,22 @@ if __name__ == "__main__":
 
 
     def calculate_hit(event):
-        current_miss = ValueBuilder.classify_miss_by_h(graphic_builder.classified_dots, graphic_builder.DISTANCE_ALGORITHM,
+        current_miss = ValueBuilder.classify_miss_by_h(graphic_builder.classified_dots,
+                                                       graphic_builder.DISTANCE_ALGORITHM,
                                                        graphic_builder.KERNEL, graphic_builder.h)
         loss_text.set_text(f"Total hit: {current_miss}/{graphic_builder.l}")
 
 
     def update_spans_classify():
         graphic_builder.classify_dot()
+
+        # graphic_builder.etalons_vertical = []
+        # graphic_builder.etalons_horizontal = []
+        # etalon_dots = list(
+        #     sorted(np.column_stack((graphic_builder.etalons_horizontal, graphic_builder.etalons_vertical)),
+        #            key=lambda x: (x[0], x[1])))
+        # etalons.set_offsets(etalon_dots)
+
         hor_res, ver_res = graphic_builder.box_hor_ver()
         [p.remove() for p in reversed(ax.patches)]
 
@@ -145,6 +161,7 @@ if __name__ == "__main__":
         graphic_builder.DISTANCE_ALGORITHM = distance_dict[label]
         update_spans_classify()
 
+
     def update_weight(label):
         fig.canvas.draw_idle()
         graphic_builder.KERNEL = kernel_dict[label]
@@ -159,6 +176,8 @@ if __name__ == "__main__":
 
     def update_n(val):
         fig.canvas.draw_idle()
+        graphic_builder.etalons_vertical = []
+        graphic_builder.etalons_horizontal = []
         graphic_builder.n = int(val)
         graphic_builder.generate_ab_and_classify()
         global vertical_lines
@@ -168,10 +187,16 @@ if __name__ == "__main__":
         for index, vertical_line in enumerate(graphic_builder.ab_segment):
             vertical_lines[index] = ax.axvline(vertical_line, linestyle="-.", linewidth=graphic_builder.LINE_WIDTH)
         update_spans_classify()
+        etalon_dots = list(
+            sorted(np.column_stack((graphic_builder.etalons_horizontal, graphic_builder.etalons_vertical)),
+                   key=lambda x: (x[0], x[1])))
+        etalons.set_offsets(etalon_dots)
 
 
     def update_m(val):
         fig.canvas.draw_idle()
+        graphic_builder.etalons_vertical = []
+        graphic_builder.etalons_horizontal = []
         graphic_builder.m = int(val)
         graphic_builder.generate_cd_and_classify()
         global horizontal_lines
@@ -181,15 +206,25 @@ if __name__ == "__main__":
         for index, horizontal_line in enumerate(graphic_builder.cd_segment):
             horizontal_lines[index] = ax.axhline(horizontal_line, linestyle="-.", linewidth=graphic_builder.LINE_WIDTH)
         update_spans_classify()
+        etalon_dots = list(
+            sorted(np.column_stack((graphic_builder.etalons_horizontal, graphic_builder.etalons_vertical)),
+                   key=lambda x: (x[0], x[1])))
+        etalons.set_offsets(etalon_dots)
 
 
     def update_dots(val):
         fig.canvas.draw_idle()
+        graphic_builder.etalons_vertical = []
+        graphic_builder.etalons_horizontal = []
         graphic_builder.l = int(val)
         graphic_builder.generate_dots_and_clasify()
         graphic_builder.classify_dot()
         update_spans_classify()
         dots_graphic.set_offsets(graphic_builder.learning_dots)
+        etalon_dots = list(
+            sorted(np.column_stack((graphic_builder.etalons_horizontal, graphic_builder.etalons_vertical)),
+                   key=lambda x: (x[0], x[1])))
+        etalons.set_offsets(etalon_dots)
 
 
     def compute_h(event):
@@ -199,7 +234,6 @@ if __name__ == "__main__":
                                                         graphic_builder.KERNEL)
         h_slider.set_val(graphic_builder.h)
         calculate_hit(event)
-
 
 
     def generate_new(event):
@@ -236,7 +270,7 @@ if __name__ == "__main__":
 
 
     radio.on_clicked(update_weight)
-#   radio_distance.on_clicked(update_distance)
+    #   radio_distance.on_clicked(update_distance)
     h_slider.on_changed(update_h)
     vert_slider.on_changed(update_n)
     hor_slider.on_changed(update_m)
