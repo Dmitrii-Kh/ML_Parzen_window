@@ -61,6 +61,14 @@ class ValueBuilder:
 
         return list(sorted(result, key=lambda x: x[2]))
 
+    @staticmethod
+    def getShortestLengthToEtalon(dot, etalons):
+        minLength = 1000
+        for etalon in etalons:
+            currLength = ValueBuilder.euclidian_distance(dot, etalon[0])
+            if minLength > currLength:
+                minLength = currLength
+        return minLength
 
     @staticmethod
     def distance_to_dots(dot, learning_dots, distance_method):

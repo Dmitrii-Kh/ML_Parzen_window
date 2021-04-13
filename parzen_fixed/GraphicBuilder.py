@@ -55,7 +55,7 @@ class GraphicBuilder:
         self.etalons_horizontal = []
         self.etalons_vertical = []
 
-        self.ETALONS_SIZE = 5
+        self.ETALONS_SIZE = 8
         self.ETALONS_COLOR = 'magenta'
 
         # building points for segments equally

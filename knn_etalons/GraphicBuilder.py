@@ -8,7 +8,7 @@ class GraphicBuilder:
         self.etalons = []
         self.etalonsPercentage = 0.3
 
-        self.ETALONS_SIZE = 5
+        self.ETALONS_SIZE = 8
         self.ETALONS_COLOR = 'magenta'
 
         self.etalons_horizontal = []
