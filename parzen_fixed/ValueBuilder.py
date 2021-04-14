@@ -91,7 +91,8 @@ class ValueBuilder:
             except KeyError:
                 r = neighbour[2] / h
                 result[neighbour[1]] = kernel(r)
-        return max(result, key=lambda key: result[key])
+        maxValClass = max(result, key=lambda key: result[key])
+        return maxValClass if result[maxValClass] > 0 else -1
 
     @staticmethod
     def select_right_h(learning_dots, distance_method, kernel):
@@ -100,7 +101,7 @@ class ValueBuilder:
             print(h)
             result[h] = ValueBuilder.classify_miss_by_h(learning_dots, distance_method, kernel, h)
         print(result)
-        return max(result, key=lambda key: result[key])
+        return max(result, key=lambda key: (result[key], key))
 
     @staticmethod
     def classify_miss_by_h(learning_dots, distance_method, kernel, h):

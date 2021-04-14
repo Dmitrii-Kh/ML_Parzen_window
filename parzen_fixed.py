@@ -121,7 +121,10 @@ if __name__ == "__main__":
 
     def update_spans_classify():
         graphic_builder.classify_dot()
-
+        if graphic_builder.point_class == -1:
+            loss_text.set_text('Not classified!')
+        else:
+            loss_text.set_text('')
         # graphic_builder.etalons_vertical = []
         # graphic_builder.etalons_horizontal = []
         # etalon_dots = list(
@@ -254,6 +257,11 @@ if __name__ == "__main__":
     def generate_new(event):
         fig.canvas.draw_idle()
         graphic_builder.generate_and_clasify_dot()
+        if graphic_builder.point_class == -1:
+            loss_text.set_text('Not classified!')
+        else:
+            loss_text.set_text('')
+
         hor_res, ver_res = graphic_builder.box_hor_ver()
 
         [p.remove() for p in reversed(ax.patches)]
